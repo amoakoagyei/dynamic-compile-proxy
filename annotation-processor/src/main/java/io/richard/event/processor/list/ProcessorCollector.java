@@ -2,16 +2,20 @@ package io.richard.event.processor.list;
 
 import java.util.List;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 public class ProcessorCollector {
 
     private ExecutableElement element;
+    private TypeElement enclosingElement;
     private int parameterCount;
     private List<String> paramTypes = List.of();
+    private String enclosingElementName = "";
 
     public static ProcessorCollector of(ExecutableElement it) {
         var processorCollector = new ProcessorCollector()
+            .withEnclosingElement((TypeElement) it.getEnclosingElement())
             .withElement(it);
 
         List<? extends VariableElement> parameters = it.getParameters();
@@ -23,6 +27,12 @@ public class ProcessorCollector {
             .withParamTypes(it.getParameters().stream()
                 .map(param -> param.asType().toString())
                 .toList());
+    }
+
+    private ProcessorCollector withEnclosingElement(TypeElement enclosingElement) {
+        this.enclosingElement = enclosingElement;
+        this.enclosingElementName = enclosingElement.asType().toString();
+        return this;
     }
 
     private ProcessorCollector withParamTypes(List<String> paramTypes) {
@@ -44,11 +54,13 @@ public class ProcessorCollector {
         return element;
     }
 
-    public List<String> paramTypes() {
-        return paramTypes;
+    public TypeElement getEnclosingElement() {
+        return enclosingElement;
     }
 
-//    public List<TypeName>
+    public List<String> getParameterTypes() {
+        return paramTypes;
+    }
 
     /**
      * @return Method Name
@@ -59,5 +71,9 @@ public class ProcessorCollector {
 
     public int getParameterCount() {
         return parameterCount;
+    }
+
+    public String getEnclosingElementName() {
+        return enclosingElementName;
     }
 }

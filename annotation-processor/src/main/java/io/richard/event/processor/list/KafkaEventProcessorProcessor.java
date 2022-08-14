@@ -63,10 +63,12 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         logger.info(String.format("Found %d processors", kafkaEventProcessors.size()));
 
         processorCollectors.forEach(processorCollector -> {
-            List<String> paramTypes = processorCollector.paramTypes();
-            paramTypes.forEach(paramType -> {
-                logger.info(paramType);
-            });
+            List<String> paramTypes = processorCollector.getParameterTypes();
+            String paramStr = String.join(",", paramTypes);
+            logger.info("%s#%s(%s)",
+                processorCollector.getEnclosingElementName(),
+                processorCollector.getElementName(),
+                paramStr);
         });
 
         return true;

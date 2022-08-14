@@ -3,8 +3,28 @@
  */
 package io.richard.event.processor.app;
 
+import java.util.UUID;
+
 public class App {
+
     public static void main(String[] args) {
-        System.out.println("App is running");
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.put(new ProductCreatedKafkaEventProcessor());
+        DependencyInjectionAdapter dependencyInjectionAdapter = new MicronautDependencyInjectionAdapter(
+            applicationContext);
+        ProcessorGroup processorGroup = new ProcessorGroup(dependencyInjectionAdapter);
+        processorGroup.register(ProductCreatedEvent.class, new ProcessorHandlerInfo() {
+            @Override
+            public int paramCount() {
+                return 1;
+            }
+
+            @Override
+            public Class<?> handleClass() {
+                return ProductCreatedKafkaEventProcessor.class;
+            }
+        });
+//        System.out.println("App is running");
+        processorGroup.process(new EventRecord<>(new ProductCreatedEvent(), UUID.randomUUID(), "partition-key-2"));
     }
 }
