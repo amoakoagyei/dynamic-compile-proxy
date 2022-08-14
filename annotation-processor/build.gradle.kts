@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(project(":annotations"))
-    annotationProcessor("com.google.auto.service:auto-service:1.0")
-    compileOnly("com.google.auto.service:auto-service:1.0")
+    implementation("com.squareup:javapoet:1.13.0")
+    annotationProcessor("com.google.auto.service:auto-service:1.0.1")
+    compileOnly("com.google.auto.service:auto-service:1.0.1")
 }

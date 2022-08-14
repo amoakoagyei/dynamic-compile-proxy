@@ -1,4 +1,9 @@
 package io.richard.event.processor.app;
 
-public class ProductCreatedEvent {
+import java.util.UUID;
+
+public record ProductCreatedEvent(
+    UUID productId,
+    String name
+    ) {
 }

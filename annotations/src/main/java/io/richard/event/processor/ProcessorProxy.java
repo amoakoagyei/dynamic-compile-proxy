@@ -1,16 +1,16 @@
-package io.richard.event.processor.app;
+package io.richard.event.processor;
 
 import java.util.UUID;
 
-public interface ProcessorChain {
+public interface ProcessorProxy {
 
     default <T> void process(ProcessorHandlerInfo handlerInfo, EventRecord<T> eventRecord) {
         if (handlerInfo.paramCount() == 3) {
-            handle(eventRecord.data, eventRecord.correlationId, eventRecord.partitionKey);
+            handle(eventRecord.data(), eventRecord.correlationId(), eventRecord.partitionKey());
         } else if (handlerInfo.paramCount() == 2) {
-            handle(eventRecord.data, eventRecord.correlationId);
+            handle(eventRecord.data(), eventRecord.correlationId());
         } else if (handlerInfo.paramCount() == 1) {
-            handle(eventRecord.data);
+            handle(eventRecord.data());
         } else {
             // handler methods should have params between 1 and 3
 //                    and should be in the order of (event, correlationId, partitionKey)

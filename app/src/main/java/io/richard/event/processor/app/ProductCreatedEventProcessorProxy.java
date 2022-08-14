@@ -1,23 +1,24 @@
 package io.richard.event.processor.app;
 
+import io.richard.event.processor.ProcessorProxy;
 import java.util.UUID;
 
-public class ItemProcessorChain implements ProcessorChain {
+public class ProductCreatedEventProcessorProxy implements ProcessorProxy {
 
     private final Object delegate;
 
-    public ItemProcessorChain(Object handlerProcessor) {
+    public ProductCreatedEventProcessorProxy(Object handlerProcessor) {
         this.delegate = handlerProcessor;
     }
 
     @Override
     public void handle(Object object) {
-        ((ProductCreatedKafkaEventProcessor) delegate).process((ProductCreatedEvent) object);
+//        ((ProductCreatedKafkaEventProcessor) delegate).process((ProductCreatedEvent) object);
     }
 
     @Override
     public void handle(Object object, UUID correlationId) {
-        ((ProductCreatedKafkaEventProcessor) delegate).process((ProductCreatedEvent) object, correlationId);
+//        ((ProductCreatedKafkaEventProcessor) delegate).process((ProductCreatedEvent) object, correlationId);
     }
 
     @Override

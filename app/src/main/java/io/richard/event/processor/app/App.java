@@ -3,6 +3,9 @@
  */
 package io.richard.event.processor.app;
 
+import io.richard.event.processor.EventRecord;
+import io.richard.event.processor.ProcessorHandlerInfo;
+import io.richard.event.processor.ProductCreatedEventProcessorHandlerInfoImpl;
 import java.util.UUID;
 
 public class App {
@@ -13,18 +16,9 @@ public class App {
         DependencyInjectionAdapter dependencyInjectionAdapter = new MicronautDependencyInjectionAdapter(
             applicationContext);
         ProcessorGroup processorGroup = new ProcessorGroup(dependencyInjectionAdapter);
-        processorGroup.register(ProductCreatedEvent.class, new ProcessorHandlerInfo() {
-            @Override
-            public int paramCount() {
-                return 1;
-            }
-
-            @Override
-            public Class<?> handleClass() {
-                return ProductCreatedKafkaEventProcessor.class;
-            }
-        });
+        processorGroup.register(ProductCreatedEvent.class, new ProductCreatedEventProcessorHandlerInfoImpl());
 //        System.out.println("App is running");
-        processorGroup.process(new EventRecord<>(new ProductCreatedEvent(), UUID.randomUUID(), "partition-key-2"));
+        processorGroup.process(new EventRecord<>(new ProductCreatedEvent(UUID.randomUUID(),
+            "Argon M.2"), UUID.randomUUID(), "partition-key-2"));
     }
 }

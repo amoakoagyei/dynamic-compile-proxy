@@ -1,4 +1,4 @@
-package io.richard.event.processor.app;
+package io.richard.event.processor;
 
 public interface ProcessorHandlerInfo {
 

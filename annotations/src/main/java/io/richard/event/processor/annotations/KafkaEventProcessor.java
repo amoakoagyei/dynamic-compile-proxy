@@ -1,4 +1,4 @@
-package io.richard.event.processor;
+package io.richard.event.processor.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

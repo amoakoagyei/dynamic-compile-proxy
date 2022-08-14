@@ -12,6 +12,8 @@ public class ProcessorCollector {
     private int parameterCount;
     private List<String> paramTypes = List.of();
     private String enclosingElementName = "";
+    private String eventClassName = "";
+    private VariableElement eventClass;
 
     public static ProcessorCollector of(ExecutableElement it) {
         var processorCollector = new ProcessorCollector()
@@ -22,11 +24,26 @@ public class ProcessorCollector {
         if (parameters == null || parameters.size() == 0) {
             return processorCollector;
         }
+
+        VariableElement variableElement = it.getParameters().get(0);
         return processorCollector
             .withParameterCount(parameters.size())
+            .withEventClass(variableElement)
+            .withEventClassName(variableElement.asType().toString())
             .withParamTypes(it.getParameters().stream()
                 .map(param -> param.asType().toString())
                 .toList());
+    }
+
+    private ProcessorCollector withEventClass(VariableElement eventClass) {
+        this.eventClass = eventClass;
+        return this;
+    }
+
+    private ProcessorCollector withEventClassName(String fullEventClassName) {
+        String[] split = fullEventClassName.split("\\.");
+        this.eventClassName = split[split.length - 1];
+        return this;
     }
 
     private ProcessorCollector withEnclosingElement(TypeElement enclosingElement) {
@@ -75,5 +92,9 @@ public class ProcessorCollector {
 
     public String getEnclosingElementName() {
         return enclosingElementName;
+    }
+
+    public String getEventClassName() {
+        return eventClassName;
     }
 }

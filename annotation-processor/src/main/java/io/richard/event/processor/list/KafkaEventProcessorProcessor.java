@@ -1,10 +1,14 @@
 package io.richard.event.processor.list;
 
 import com.google.auto.service.AutoService;
-import io.richard.event.processor.KafkaEventProcessor;
+import io.richard.event.processor.ProcessorHandlerInfo;
+import io.richard.event.processor.annotations.KafkaEventProcessor;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -26,6 +30,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     Types typeUtils;
     Filer filer;
     private Elements elementUtils;
+    private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -35,6 +40,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
+        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager, elementUtils, filer, typeUtils);
     }
 
     @Override
@@ -60,16 +66,29 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
             logger.error("Found %d methods with null or 0 params", nullOrEmptyParamMethods.size());
         }
 
-        logger.info(String.format("Found %d processors", kafkaEventProcessors.size()));
+//        logger.info(String.format("Found %d processors", kafkaEventProcessors.size()));
+//
+//        processorCollectors.forEach(processorCollector -> {
+//            List<String> paramTypes = processorCollector.getParameterTypes();
+//            String paramStr = String.join(",", paramTypes);
+//            logger.info("%s#%s(%s)",
+//                processorCollector.getEnclosingElementName(),
+//                processorCollector.getElementName(),
+//                paramStr);
+//        });
 
-        processorCollectors.forEach(processorCollector -> {
-            List<String> paramTypes = processorCollector.getParameterTypes();
-            String paramStr = String.join(",", paramTypes);
-            logger.info("%s#%s(%s)",
-                processorCollector.getEnclosingElementName(),
-                processorCollector.getElementName(),
-                paramStr);
-        });
+        Map<String, List<ProcessorCollector>> collect = processorCollectors.stream()
+            .collect(Collectors.groupingBy(ProcessorCollector::getEnclosingElementName));
+        Set<String> collectors = collect.keySet();
+        collectors
+            .forEach(it -> {
+                try {
+                    List<ProcessorCollector> processorCollectors1 = collect.get(it);
+                    processorHandlerInfoGenerator.generate(processorCollectors1.get(0));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
         return true;
     }

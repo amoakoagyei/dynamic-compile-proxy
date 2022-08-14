@@ -1,5 +1,8 @@
 package io.richard.event.processor.app;
 
+import io.richard.event.processor.EventRecord;
+import io.richard.event.processor.ProcessorHandlerInfo;
+import io.richard.event.processor.ProcessorProxy;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +22,11 @@ public class ProcessorGroup {
     Map<Class<?>, ProcessorHandlerInfo> handlers = new ConcurrentHashMap<>();
 
     void process(EventRecord<ProductCreatedEvent> eventRecord) {
-        if (eventRecord.data == null) {
+        if (eventRecord.data() == null) {
             return;
         }
 
-        Class<?> dataClass = eventRecord.data.getClass();
+        Class<?> dataClass = eventRecord.data().getClass();
         ProcessorHandlerInfo handlerInfo = findHandlers(dataClass);
         if (handlerInfo == null) {
             return;
@@ -32,7 +35,7 @@ public class ProcessorGroup {
         Optional<Object> bean = dependencyInjectionAdapter.getBean(handlerInfo.handleClass());
         Object handlerProcessor = bean.orElseThrow(() -> new EventHandlerNotFoundException(dataClass));
 
-        ProcessorChain itemProcessorChain = new ItemProcessorChain(handlerProcessor);
+        ProcessorProxy itemProcessorChain = new ProductCreatedEventProcessorProxy(handlerProcessor);
         itemProcessorChain.process(handlerInfo, eventRecord);
     }
 
