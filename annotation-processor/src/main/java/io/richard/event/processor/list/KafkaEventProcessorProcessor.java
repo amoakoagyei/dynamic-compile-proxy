@@ -31,6 +31,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
     private ProcessorProxyGenerator processorProxyGenerator;
+    private ProxyProcessorChainGenerator proxyProcessorChainGenerator;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -40,8 +41,9 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
-        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager,  filer);
-        processorProxyGenerator = new ProcessorProxyGenerator(messager,  filer);
+        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager, filer);
+        processorProxyGenerator = new ProcessorProxyGenerator(messager, filer);
+        proxyProcessorChainGenerator = new ProxyProcessorChainGenerator(messager, filer);
     }
 
     @Override
@@ -80,6 +82,8 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
                     throw new RuntimeException(e);
                 }
             });
+
+        proxyProcessorChainGenerator.generateProxyProcessorChain(processorCollectors, filer);
 
         return true;
     }

@@ -1,6 +1,7 @@
 package io.richard.event.processor.app;
 
 import io.richard.event.processor.DependencyInjectionAdapter;
+import io.richard.event.processor.EventHandlerNotFoundException;
 import io.richard.event.processor.EventRecord;
 import io.richard.event.processor.ProcessorProxy;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class ProcessorGroup {
         this.dependencyInjectionAdapter = dependencyInjectionAdapter;
     }
 
-    void process(EventRecord<ProductCreatedEvent> eventRecord) {
+    void process(EventRecord<?> eventRecord) {
         if (eventRecord.data() == null) {
             return;
         }
@@ -30,25 +31,10 @@ public class ProcessorGroup {
         Class<?> proxyClass = proxyProcessors.get(dataClass);
 
         Optional<Object> handlerProxy = dependencyInjectionAdapter.getBean(proxyClass);
-        ProcessorProxy processorProxy = handlerProxy.map(it -> (ProcessorProxy)it).orElseThrow(() -> new EventHandlerNotFoundException(dataClass));
+        ProcessorProxy processorProxy = handlerProxy
+            .map(it -> (ProcessorProxy)it)
+            .orElseThrow(() -> new EventHandlerNotFoundException(dataClass));
         processorProxy.handle(eventRecord);
-
-//        ProcessorProxy itemProcessorChain = new ProductCreatedEventProxyImpl(handlerProcessor);
-//        itemProcessorChain.handle(eventRecord);
-//        if (handlerInfo.paramCount() == 3) {
-//            itemProcessorChain.handle(eventRecord.data(), eventRecord.correlationId(), eventRecord.partitionKey());
-//        } else if (handlerInfo.paramCount() == 2) {
-//            itemProcessorChain.handle(eventRecord.data(), eventRecord.correlationId(), "");
-//        } else if (handlerInfo.paramCount() == 1) {
-//            itemProcessorChain.handle(eventRecord.data(), null, "");
-//        } else {
-        // handler methods should have params between 1 and 3
-//                    and should be in the order of (event, correlationId, partitionKey)
-        // event can be any class object
-        // correlationId is expected to be UUID
-        // partition
-//            throw new RuntimeException("HandlerParam Count is out of range of methods");
-//        }
     }
 
 
