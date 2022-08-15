@@ -93,8 +93,24 @@ public class ProcessorProxyGenerator {
                 DELEGATE_FIELD,
                 processorCollector.getElementName(),
                 EVENT_RECORD_DATA_VARIABLE,
-                "correlationId",
+                CORRELATION_ID,
                 PARTITION_KEY
+            );
+        }
+
+        if (processorCollector.getParameterCount() == 2) {
+            methodSpecBuilder.addStatement(
+                "var $L = $L.$L()",
+                CORRELATION_ID,
+                EVENT_RECORD_PARAM,
+                CORRELATION_ID
+            );
+            methodSpecBuilder.addStatement(
+                "this.$L.$L($L, $L)",
+                DELEGATE_FIELD,
+                processorCollector.getElementName(),
+                EVENT_RECORD_DATA_VARIABLE,
+                CORRELATION_ID
             );
         }
 

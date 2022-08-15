@@ -6,6 +6,7 @@ package io.richard.event.processor.app;
 import io.richard.event.processor.DependencyInjectionAdapter;
 import io.richard.event.processor.EventRecord;
 import io.richard.event.processor.ProductCreatedEventProxyImpl;
+import io.richard.event.processor.ProductUpdatedEventProxyImpl;
 import java.util.UUID;
 
 public class App {
@@ -13,7 +14,9 @@ public class App {
     public static void main(String[] args) {
         ApplicationContext applicationContext = new ApplicationContext();
         applicationContext.put(new ProductCreatedKafkaEventProcessor());
+        applicationContext.put(new ProductUpdatedEventKafkaEventProcessor());
         applicationContext.put(new ProductCreatedEventProxyImpl(new ProductCreatedKafkaEventProcessor()));
+        applicationContext.put(new ProductUpdatedEventProxyImpl(new ProductUpdatedEventKafkaEventProcessor()));
         DependencyInjectionAdapter dependencyInjectionAdapter = new MicronautDependencyInjectionAdapter(
             applicationContext);
         ProcessorGroup processorGroup = new ProcessorGroup(dependencyInjectionAdapter);
