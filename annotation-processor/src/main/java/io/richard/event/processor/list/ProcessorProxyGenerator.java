@@ -114,6 +114,16 @@ public class ProcessorProxyGenerator {
             );
         }
 
+        if(processorCollector.getParameterCount() == 1) {
+            methodSpecBuilder.addStatement(
+                "this.$L.$L($L)",
+                DELEGATE_FIELD,
+                processorCollector.getElementName(),
+                EVENT_RECORD_DATA_VARIABLE
+            );
+
+        }
+
         return methodSpecBuilder.build();
     }
 }
