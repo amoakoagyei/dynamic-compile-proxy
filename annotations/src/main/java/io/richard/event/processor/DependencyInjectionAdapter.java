@@ -1,4 +1,4 @@
-package io.richard.event.processor.app;
+package io.richard.event.processor;
 
 import java.util.Optional;
 

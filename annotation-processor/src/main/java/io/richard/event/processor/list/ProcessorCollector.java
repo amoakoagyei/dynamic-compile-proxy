@@ -75,6 +75,10 @@ public class ProcessorCollector {
         return enclosingElement;
     }
 
+    public VariableElement getEventClass() {
+        return this.eventClass;
+    }
+
     public List<String> getParameterTypes() {
         return paramTypes;
     }

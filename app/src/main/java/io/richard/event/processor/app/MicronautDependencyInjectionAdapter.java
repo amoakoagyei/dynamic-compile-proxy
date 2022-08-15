@@ -1,8 +1,9 @@
 package io.richard.event.processor.app;
 
+import io.richard.event.processor.DependencyInjectionAdapter;
 import java.util.Optional;
 
-public class MicronautDependencyInjectionAdapter implements DependencyInjectionAdapter{
+public class MicronautDependencyInjectionAdapter implements DependencyInjectionAdapter {
     final ApplicationContext applicationContext;
 
     public MicronautDependencyInjectionAdapter(

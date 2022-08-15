@@ -6,5 +6,7 @@ public interface ProcessorHandlerInfo {
 
     Class<?> handleClass();
 
+    Class<?> proxyClass();
+
 
 }

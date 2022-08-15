@@ -15,14 +15,10 @@ import javax.lang.model.util.Types;
 public class ProcessorHandlerInfoGenerator {
 
     private final Logger logger;
-//    private final Elements elementUtils;
-//    private final Types typeUtils;
     private final Filer filer;
 
-    public ProcessorHandlerInfoGenerator(Messager messager, Elements elementUtils, Filer filer, Types typeUtils) {
+    public ProcessorHandlerInfoGenerator(Messager messager, Filer filer) {
         logger = Logger.init(ProcessorHandlerInfoGenerator.class, messager);
-//        this.elementUtils = elementUtils;
-//        this.typeUtils = typeUtils;
         this.filer = filer;
     }
 
@@ -33,13 +29,12 @@ public class ProcessorHandlerInfoGenerator {
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addSuperinterface(ProcessorHandlerInfo.class)
             .addMethod(paramCount(processorCollector))
-            .addMethod(handlerClass(processorCollector));
+            .addMethod(handlerClass(processorCollector))
+            .addMethod(proxyClass(processorCollector));
 
         JavaFile javaFile = JavaFile.builder("io.richard.event.processor", typeSpec.build())
             .build();
-////
         javaFile.writeTo(filer);
-//        javaFile.writeTo(System.out);
     }
 
     private MethodSpec paramCount(ProcessorCollector processorCollector) {
@@ -66,5 +61,17 @@ public class ProcessorHandlerInfoGenerator {
         return methodSpecBuilder.build();
     }
 
+    private MethodSpec proxyClass(ProcessorCollector processorCollector) {
+        var methodSpecBuilder = MethodSpec.methodBuilder("proxyClass")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(JavaPoetHelpers.classOfAny());
+
+        TypeName typeName = TypeName.get(processorCollector.getEventClass().asType());
+
+        methodSpecBuilder.addStatement("\treturn $TProxyImpl.class", typeName);
+
+        return methodSpecBuilder.build();
+    }
 
 }

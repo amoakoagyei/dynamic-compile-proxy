@@ -1,7 +1,6 @@
 package io.richard.event.processor.list;
 
 import com.google.auto.service.AutoService;
-import io.richard.event.processor.ProcessorHandlerInfo;
 import io.richard.event.processor.annotations.KafkaEventProcessor;
 import java.io.IOException;
 import java.util.Collections;
@@ -31,6 +30,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     Filer filer;
     private Elements elementUtils;
     private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
+    private ProcessorProxyGenerator processorProxyGenerator;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -40,7 +40,8 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
-        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager, elementUtils, filer, typeUtils);
+        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager,  filer);
+        processorProxyGenerator = new ProcessorProxyGenerator(messager,  filer);
     }
 
     @Override
@@ -66,17 +67,6 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
             logger.error("Found %d methods with null or 0 params", nullOrEmptyParamMethods.size());
         }
 
-//        logger.info(String.format("Found %d processors", kafkaEventProcessors.size()));
-//
-//        processorCollectors.forEach(processorCollector -> {
-//            List<String> paramTypes = processorCollector.getParameterTypes();
-//            String paramStr = String.join(",", paramTypes);
-//            logger.info("%s#%s(%s)",
-//                processorCollector.getEnclosingElementName(),
-//                processorCollector.getElementName(),
-//                paramStr);
-//        });
-
         Map<String, List<ProcessorCollector>> collect = processorCollectors.stream()
             .collect(Collectors.groupingBy(ProcessorCollector::getEnclosingElementName));
         Set<String> collectors = collect.keySet();
@@ -85,6 +75,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
                 try {
                     List<ProcessorCollector> processorCollectors1 = collect.get(it);
                     processorHandlerInfoGenerator.generate(processorCollectors1.get(0));
+                    processorProxyGenerator.generate(processorCollectors1.get(0));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
