@@ -18,7 +18,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 @AutoService(Processor.class)
@@ -28,7 +27,6 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     Messager messager;
     Types typeUtils;
     Filer filer;
-    private Elements elementUtils;
     private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
     private ProcessorProxyGenerator processorProxyGenerator;
     private ProxyProcessorChainGenerator proxyProcessorChainGenerator;
@@ -36,14 +34,13 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        elementUtils = processingEnv.getElementUtils();
         messager = processingEnv.getMessager();
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
         processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager, filer);
-        processorProxyGenerator = new ProcessorProxyGenerator(messager, filer);
-        proxyProcessorChainGenerator = new ProxyProcessorChainGenerator(messager, filer);
+        processorProxyGenerator = new ProcessorProxyGenerator(filer);
+        proxyProcessorChainGenerator = new ProxyProcessorChainGenerator();
     }
 
     @Override

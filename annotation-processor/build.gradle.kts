@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(project(":annotations"))
     implementation("com.squareup:javapoet:1.13.0")
+    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
     annotationProcessor("com.google.auto.service:auto-service:1.0.1")
     compileOnly("com.google.auto.service:auto-service:1.0.1")
 }

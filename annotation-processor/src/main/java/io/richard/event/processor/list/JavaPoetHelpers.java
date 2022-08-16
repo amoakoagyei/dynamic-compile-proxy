@@ -21,24 +21,4 @@ public class JavaPoetHelpers {
         return ParameterizedTypeName.get(
             ClassName.get(EventRecord.class), wildcard);
     }
-
-//    public static ParameterizedTypeName getParameterizedAggregateRoot() {
-//        TypeName aggregateIdWildCard = WildcardTypeName.subtypeOf(AggregateId.class);
-//        return ParameterizedTypeName.get(
-//            ClassName.get(AbstractAggregateRoot.class), aggregateIdWildCard,
-//            ClassName.get(VersionedEvent.class));
-//    }
-
-//    public static FieldSpec generateEventsApplierMapField(String fieldName) {
-//        return FieldSpec.builder(
-//                ParameterizedTypeName.get(
-//                    ClassName.get(Map.class),
-//                    classOfAny(),
-//                    eventApplierBeanName
-//                ),
-//                fieldName
-//            )
-//            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-//            .build();
-//    }
 }

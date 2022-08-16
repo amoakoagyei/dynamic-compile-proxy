@@ -10,7 +10,6 @@ public class ProcessorCollector {
     private ExecutableElement element;
     private TypeElement enclosingElement;
     private int parameterCount;
-    private List<String> paramTypes = List.of();
     private String enclosingElementName = "";
     private String eventClassName = "";
     private VariableElement eventClass;
@@ -29,10 +28,7 @@ public class ProcessorCollector {
         return processorCollector
             .withParameterCount(parameters.size())
             .withEventClass(variableElement)
-            .withEventClassName(variableElement.asType().toString())
-            .withParamTypes(it.getParameters().stream()
-                .map(param -> param.asType().toString())
-                .toList());
+            .withEventClassName(variableElement.asType().toString());
     }
 
     private ProcessorCollector withEventClass(VariableElement eventClass) {
@@ -52,11 +48,6 @@ public class ProcessorCollector {
         return this;
     }
 
-    private ProcessorCollector withParamTypes(List<String> paramTypes) {
-        this.paramTypes = paramTypes;
-        return this;
-    }
-
     private ProcessorCollector withParameterCount(int paramCount) {
         this.parameterCount = paramCount;
         return this;
@@ -67,20 +58,12 @@ public class ProcessorCollector {
         return this;
     }
 
-    public ExecutableElement getElement() {
-        return element;
-    }
-
     public TypeElement getEnclosingElement() {
         return enclosingElement;
     }
 
     public VariableElement getEventClass() {
         return this.eventClass;
-    }
-
-    public List<String> getParameterTypes() {
-        return paramTypes;
     }
 
     /**

@@ -1,16 +1,17 @@
 package io.richard.event.processor.list;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import io.richard.event.processor.ProcessorHandlerInfo;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 
 public class ProcessorHandlerInfoGenerator {
 
@@ -28,6 +29,10 @@ public class ProcessorHandlerInfoGenerator {
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addSuperinterface(ProcessorHandlerInfo.class)
+            .addAnnotation(AnnotationSpec.builder(Named.class)
+                .addMember("value", "$S", StringUtil.toCamelCase(className))
+                .build())
+            .addAnnotation(AnnotationSpec.builder(Singleton.class).build())
             .addMethod(paramCount(processorCollector))
             .addMethod(handlerClass(processorCollector))
             .addMethod(proxyClass(processorCollector));
@@ -43,9 +48,9 @@ public class ProcessorHandlerInfoGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(TypeName.INT);
 
-        methodSpecBuilder.addStatement("\treturn $L", processorCollector.getParameterCount());
-
-        return methodSpecBuilder.build();
+        return methodSpecBuilder
+            .addStatement("\treturn $L", processorCollector.getParameterCount())
+            .build();
     }
 
     private MethodSpec handlerClass(ProcessorCollector processorCollector) {
@@ -54,11 +59,9 @@ public class ProcessorHandlerInfoGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(JavaPoetHelpers.classOfAny());
 
-        TypeName typeName = TypeName.get(processorCollector.getEnclosingElement().asType());
-
-        methodSpecBuilder.addStatement("\treturn $T.class", typeName);
-
-        return methodSpecBuilder.build();
+        return methodSpecBuilder
+            .addStatement("\treturn $T.class", TypeName.get(processorCollector.getEnclosingElement().asType()))
+            .build();
     }
 
     private MethodSpec proxyClass(ProcessorCollector processorCollector) {
@@ -67,11 +70,9 @@ public class ProcessorHandlerInfoGenerator {
             .addModifiers(Modifier.PUBLIC)
             .returns(JavaPoetHelpers.classOfAny());
 
-        TypeName typeName = TypeName.get(processorCollector.getEventClass().asType());
-
-        methodSpecBuilder.addStatement("\treturn $TProxyImpl.class", typeName);
-
-        return methodSpecBuilder.build();
+        return methodSpecBuilder
+            .addStatement("\treturn $TProxyImpl.class", TypeName.get(processorCollector.getEventClass().asType()))
+            .build();
     }
 
 }

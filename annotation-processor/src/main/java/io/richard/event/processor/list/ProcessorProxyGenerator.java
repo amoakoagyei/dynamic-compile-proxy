@@ -1,5 +1,6 @@
 package io.richard.event.processor.list;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -7,15 +8,15 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import io.richard.event.processor.ProcessorProxy;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
 public class ProcessorProxyGenerator {
 
-    private final Logger logger;
     private final Filer filer;
 
     private static final String DELEGATE_FIELD = "delegate";
@@ -24,10 +25,9 @@ public class ProcessorProxyGenerator {
     private static final String EVENT_RECORD_PARAM = "eventRecord";
     private static final String PARTITION_KEY = "partitionKey";
     private static final String CORRELATION_ID = "correlationId";
-    private static final String PROXY_IMPL_SUFFIX = "ProxyImpl";
+    static final String PROXY_IMPL_SUFFIX = "ProxyImpl";
 
-    public ProcessorProxyGenerator(Messager messager, Filer filer) {
-        logger = Logger.init(ProcessorProxyGenerator.class, messager);
+    public ProcessorProxyGenerator(Filer filer) {
         this.filer = filer;
     }
 
@@ -38,6 +38,10 @@ public class ProcessorProxyGenerator {
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addSuperinterface(ProcessorProxy.class)
+            .addAnnotation(AnnotationSpec.builder(Named.class)
+                .addMember("value", "$S", StringUtil.toCamelCase(className))
+                .build())
+            .addAnnotation(AnnotationSpec.builder(Singleton.class).build())
             .addField(FieldSpec.builder(delegateTypeName, DELEGATE_FIELD)
                 .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                 .build())
@@ -47,7 +51,6 @@ public class ProcessorProxyGenerator {
         JavaFile javaFile = JavaFile.builder("io.richard.event.processor", typeSpec.build())
             .build();
         javaFile.writeTo(filer);
-        javaFile.writeTo(System.out);
     }
 
     private MethodSpec generateConstructor(TypeName delegateTypeName) {
@@ -114,7 +117,7 @@ public class ProcessorProxyGenerator {
             );
         }
 
-        if(processorCollector.getParameterCount() == 1) {
+        if (processorCollector.getParameterCount() == 1) {
             methodSpecBuilder.addStatement(
                 "this.$L.$L($L)",
                 DELEGATE_FIELD,
