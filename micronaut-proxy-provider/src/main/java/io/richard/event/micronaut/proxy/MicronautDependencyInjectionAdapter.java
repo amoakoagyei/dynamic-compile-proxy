@@ -1,4 +1,4 @@
-package io.richard.event.processor.app;
+package io.richard.event.micronaut.proxy;
 
 import io.richard.event.processor.DependencyInjectionAdapter;
 import java.util.Optional;
