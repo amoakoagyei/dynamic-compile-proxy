@@ -4,6 +4,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/*
+Header:
+CorrelationId:
+source:
+PartitionKey:
+ObjectType:
+SimpleObjectType:
+timestamp
+id
+
+{
+
+}
+
+if (this.objectType != null) {
+            return this.ObjectType.replaceFirst(".*\\.", "");
+        }
+        return null;
+ */
+
 public record EventRecord<T>(
     T data,
     UUID correlationId,
