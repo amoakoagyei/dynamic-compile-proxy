@@ -15,17 +15,14 @@ import javax.lang.model.element.Modifier;
 
 public class ProcessorHandlerInfoGenerator {
 
-    private final Logger logger;
     private final Filer filer;
 
-    public ProcessorHandlerInfoGenerator(Messager messager, Filer filer) {
-        logger = Logger.init(ProcessorHandlerInfoGenerator.class, messager);
+    public ProcessorHandlerInfoGenerator(Filer filer) {
         this.filer = filer;
     }
 
     public void generate(ProcessorCollector processorCollector) throws IOException {
         String className = String.format("%sProcessorHandlerInfoImpl", processorCollector.getEventClassName());
-        logger.info("generating ProcessorHandlerInfo for %s", processorCollector.getEnclosingElementName());
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addSuperinterface(ProcessorHandlerInfo.class)

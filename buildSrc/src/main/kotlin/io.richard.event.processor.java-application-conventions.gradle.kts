@@ -9,3 +9,11 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
+
+tasks.withType<Test>() {
+    jvmArgs.add("--enable-preview")
+}
+
+tasks.withType<JavaExec>() {
+    jvmArgs.add("--enable-preview")
+}

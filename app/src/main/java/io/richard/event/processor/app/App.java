@@ -3,31 +3,42 @@
  */
 package io.richard.event.processor.app;
 
-import io.richard.event.processor.DependencyInjectionAdapter;
-import io.richard.event.processor.EventRecord;
-import io.richard.event.processor.ProductCreatedEventProxyImpl;
-import io.richard.event.processor.ProductDeletedEventProxyImpl;
-import io.richard.event.processor.ProductUpdatedEventProxyImpl;
-import java.util.UUID;
+import io.micronaut.context.event.ApplicationEventListener;
+import io.micronaut.context.event.StartupEvent;
+import io.micronaut.runtime.Micronaut;
+import jakarta.inject.Singleton;
 
 public class App {
 
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new ApplicationContext();
-        applicationContext.put(new ProductCreatedKafkaEventProcessor());
-        applicationContext.put(new ProductUpdatedEventKafkaEventProcessor());
-        applicationContext.put(new ProductDeletedEventKafkaEventProcessor());
-        applicationContext.put(new ProductCreatedEventProxyImpl(new ProductCreatedKafkaEventProcessor()));
-        applicationContext.put(new ProductUpdatedEventProxyImpl(new ProductUpdatedEventKafkaEventProcessor()));
-        applicationContext.put(new ProductDeletedEventProxyImpl(new ProductDeletedEventKafkaEventProcessor()));
-        DependencyInjectionAdapter dependencyInjectionAdapter = new MicronautDependencyInjectionAdapter(
-            applicationContext);
-        ProcessorGroup processorGroup = new ProcessorGroup(dependencyInjectionAdapter);
+        Micronaut.run(App.class, args);
+//        ApplicationContext applicationContext = Micronaut.
+//        ApplicationContext applicationContext = new ApplicationContext();
+//        applicationContext.put(new ProductCreatedKafkaEventProcessor());
+//        applicationContext.put(new ProductUpdatedEventKafkaEventProcessor());
+//        applicationContext.put(new ProductDeletedEventKafkaEventProcessor());
+//        applicationContext.put(new ProductCreatedEventProxyImpl(new ProductCreatedKafkaEventProcessor()));
+//        applicationContext.put(new ProductUpdatedEventProxyImpl(new ProductUpdatedEventKafkaEventProcessor()));
+//        applicationContext.put(new ProductDeletedEventProxyImpl(new ProductDeletedEventKafkaEventProcessor()));
+//        DependencyInjectionAdapter dependencyInjectionAdapter = new MicronautDependencyInjectionAdapter(
+//            applicationContext);
+//        ProcessorGroup processorGroup = new ProcessorGroup(dependencyInjectionAdapter);
+//
+//        processorGroup.registerProxy(ProductCreatedEvent.class, ProductCreatedEventProxyImpl.class);
+////        processorGroup.register(ProductCreatedEvent.class, new ProductCreatedEventProcessorHandlerInfoImpl());
+////        System.out.println("App is running");
+//        processorGroup.process(new EventRecord<>(new ProductCreatedEvent(UUID.randomUUID(),
+//            "Argon M.2"), UUID.randomUUID(), "partition-key-2"));
+    }
 
-        processorGroup.registerProxy(ProductCreatedEvent.class, ProductCreatedEventProxyImpl.class);
-//        processorGroup.register(ProductCreatedEvent.class, new ProductCreatedEventProcessorHandlerInfoImpl());
-//        System.out.println("App is running");
-        processorGroup.process(new EventRecord<>(new ProductCreatedEvent(UUID.randomUUID(),
-            "Argon M.2"), UUID.randomUUID(), "partition-key-2"));
+
+}
+
+@Singleton
+class ApplicationStartedEventImpl implements ApplicationEventListener<StartupEvent> {
+
+    @Override
+    public void onApplicationEvent(StartupEvent event) {
+        System.out.println("Application started");
     }
 }

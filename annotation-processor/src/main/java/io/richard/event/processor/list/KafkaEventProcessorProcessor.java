@@ -38,7 +38,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
-        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(messager, filer);
+        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(filer);
         processorProxyGenerator = new ProcessorProxyGenerator(filer);
         proxyProcessorChainGenerator = new ProxyProcessorChainGenerator();
     }
@@ -68,8 +68,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
 
         Map<String, List<ProcessorCollector>> collect = processorCollectors.stream()
             .collect(Collectors.groupingBy(ProcessorCollector::getEnclosingElementName));
-        Set<String> collectors = collect.keySet();
-        collectors
+        collect.keySet()
             .forEach(it -> {
                 try {
                     List<ProcessorCollector> processorCollectors1 = collect.get(it);

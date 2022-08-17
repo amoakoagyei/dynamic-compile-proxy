@@ -15,6 +15,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import io.richard.event.processor.DependencyInjectionAdapter;
 import io.richard.event.processor.EventHandlerNotFoundException;
+import io.richard.event.processor.EventProcessorNotFoundException;
 import io.richard.event.processor.ProcessorProxy;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -82,13 +83,16 @@ public class ProxyProcessorChainGenerator {
         methodSpecBuilder
             .addStatement("var dataClass = eventRecord.data().getClass()")
             .addStatement("var proxyClass = proxyProcessors.get(dataClass)")
-            .addStatement("var handlerProxy = dependencyInjectionAdapter.getBean(proxyClass)");
+            .beginControlFlow("if(proxyClass == null)")
+            .addStatement("throw new $T(dataClass)", EventProcessorNotFoundException.class)
+            .endControlFlow();
 
-        methodSpecBuilder.addCode(CodeBlock.builder()
-            .add("var processorProxy = handlerProxy\n")
-            .add("\t.map(it -> ($T)it)\n", ProcessorProxy.class)
-            .add("\t.orElseThrow(() -> new $T(dataClass));\n", EventHandlerNotFoundException.class)
-            .build());
+        methodSpecBuilder.addStatement("var handlerProxy = dependencyInjectionAdapter.getBean(proxyClass)")
+            .addCode(CodeBlock.builder()
+                .add("var processorProxy = handlerProxy\n")
+                .add("\t.map(it -> ($T)it)\n", ProcessorProxy.class)
+                .add("\t.orElseThrow(() -> new $T(dataClass));\n", EventHandlerNotFoundException.class)
+                .build());
 
         return methodSpecBuilder.addStatement("\nprocessorProxy.handle(eventRecord)")
             .build();
