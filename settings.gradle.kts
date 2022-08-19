@@ -8,5 +8,5 @@
  */
 
 rootProject.name = "event-processor"
-include("app", "annotations", "annotation-processor")
+include("app", "annotations", "kafka-event-annotation-processor")
 include("micronaut-proxy-provider")

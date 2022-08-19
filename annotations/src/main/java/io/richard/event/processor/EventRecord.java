@@ -1,28 +1,15 @@
 package io.richard.event.processor;
 
+import static io.richard.event.processor.EventRecordHeaders.CORRELATION_ID;
+import static io.richard.event.processor.EventRecordHeaders.OBJECT_TYPE;
+import static io.richard.event.processor.EventRecordHeaders.PARTITION_KEY;
+import static io.richard.event.processor.EventRecordHeaders.SIMPLE_OBJECT_TYPE;
+import static io.richard.event.processor.EventRecordHeaders.TIMESTAMP;
+
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-/*
-Header:
-CorrelationId:
-source:
-PartitionKey:
-ObjectType:
-SimpleObjectType:
-timestamp
-id
-
-{
-
-}
-
-if (this.objectType != null) {
-            return this.ObjectType.replaceFirst(".*\\.", "");
-        }
-        return null;
- */
 
 public record EventRecord<T>(
     T data,
@@ -31,27 +18,29 @@ public record EventRecord<T>(
     Map<String, Object> headers
 ) {
 
-    private static final String CORRELATION_ID_KEY = "correlationId";
-    private static final String PARTITION_KEY = "partitionKey";
-
     public EventRecord {
         if (headers == null) {
             headers = new HashMap<>();
-        }else{
+        } else {
             headers = new HashMap<>(headers);
         }
 
         if (correlationId != null) {
-            headers.put(CORRELATION_ID_KEY, correlationId);
+            headers.put(CORRELATION_ID, correlationId);
         }
         if (partitionKey != null) {
-            headers.put(PARTITION_KEY, correlationId);
+            headers.put(PARTITION_KEY, partitionKey);
         }
+
+        String objectType = data.getClass().getCanonicalName();
+        headers.computeIfAbsent(OBJECT_TYPE, k -> objectType);
+        headers.computeIfAbsent(SIMPLE_OBJECT_TYPE, k -> objectType.replaceFirst(".*\\.", ""));
+        headers.computeIfAbsent(TIMESTAMP, k -> Instant.now().toString());
     }
 
     public EventRecord(T data, UUID correlationId, String partitionKey) {
         this(data, correlationId, partitionKey, Map.of(
-            CORRELATION_ID_KEY, correlationId,
+            CORRELATION_ID, correlationId,
             PARTITION_KEY, partitionKey
         ));
     }

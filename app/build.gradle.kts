@@ -15,7 +15,7 @@ dependencies {
 
     implementation(project(":annotations"))
     implementation(project(":micronaut-proxy-provider"))
-    annotationProcessor(project(":annotation-processor"))
+    annotationProcessor(project(":kafka-event-annotation-processor"))
 
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut.picocli:micronaut-picocli")
@@ -33,8 +33,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("19")
-    targetCompatibility = JavaVersion.toVersion("19")
+    sourceCompatibility = JavaVersion.toVersion("18")
+    targetCompatibility = JavaVersion.toVersion("18")
 }
 
 micronaut {
