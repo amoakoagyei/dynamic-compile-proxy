@@ -27,7 +27,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
     Messager messager;
     Types typeUtils;
     Filer filer;
-    private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
+//    private ProcessorHandlerInfoGenerator processorHandlerInfoGenerator;
     private ProcessorProxyGenerator processorProxyGenerator;
     private ProxyProcessorChainGenerator proxyProcessorChainGenerator;
 
@@ -38,7 +38,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
         logger = Logger.init(KafkaEventProcessorProcessor.class, messager);
-        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(filer);
+//        processorHandlerInfoGenerator = new ProcessorHandlerInfoGenerator(filer);
         processorProxyGenerator = new ProcessorProxyGenerator(filer);
         proxyProcessorChainGenerator = new ProxyProcessorChainGenerator();
     }
@@ -72,7 +72,7 @@ public class KafkaEventProcessorProcessor extends AbstractProcessor {
             .forEach(it -> {
                 try {
                     List<ProcessorCollector> processorCollectors1 = collect.get(it);
-                    processorHandlerInfoGenerator.generate(processorCollectors1.get(0));
+//                    processorHandlerInfoGenerator.generate(processorCollectors1.get(0));
                     processorProxyGenerator.generate(processorCollectors1.get(0));
                 } catch (IOException e) {
                     throw new RuntimeException(e);

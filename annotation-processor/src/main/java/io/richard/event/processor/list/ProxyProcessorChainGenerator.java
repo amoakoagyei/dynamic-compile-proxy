@@ -16,6 +16,7 @@ import com.squareup.javapoet.TypeSpec;
 import io.richard.event.processor.DependencyInjectionAdapter;
 import io.richard.event.processor.EventHandlerNotFoundException;
 import io.richard.event.processor.EventProcessorNotFoundException;
+import io.richard.event.processor.ProcessorHandlerDetails;
 import io.richard.event.processor.ProcessorProxy;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -37,7 +38,11 @@ public class ProxyProcessorChainGenerator {
         processorCollectors.forEach(processorCollector -> {
             String className = String.format("%s%s", processorCollector.getEventClassName(), PROXY_IMPL_SUFFIX);
             TypeName typeName = TypeName.get(processorCollector.getEventClass().asType());
-            staticBlockBuilder.addStatement("proxyProcessors.put($T.class, $L.class)", typeName, className);
+            staticBlockBuilder.addStatement(
+                "proxyProcessors.put($T.class, new $T($L, $L.class))",
+                typeName,
+                ProcessorHandlerDetails.class,
+                processorCollector.getParameterCount(), className);
         });
 
         TypeSpec.Builder processChainBuilder = TypeSpec.classBuilder(PROXY_PROCESSOR_CLASS)
@@ -82,12 +87,13 @@ public class ProxyProcessorChainGenerator {
 
         methodSpecBuilder
             .addStatement("var dataClass = eventRecord.data().getClass()")
-            .addStatement("var proxyClass = proxyProcessors.get(dataClass)")
-            .beginControlFlow("if(proxyClass == null)")
+            .addStatement("var handlerDetails = proxyProcessors.get(dataClass)")
+            .beginControlFlow("if(handlerDetails == null)")
             .addStatement("throw new $T(dataClass)", EventProcessorNotFoundException.class)
             .endControlFlow();
 
-        methodSpecBuilder.addStatement("var handlerProxy = dependencyInjectionAdapter.getBean(proxyClass)")
+        methodSpecBuilder.addStatement(
+                "var handlerProxy = dependencyInjectionAdapter.getBean(handlerDetails.handlerProxy())")
             .addCode(CodeBlock.builder()
                 .add("var processorProxy = handlerProxy\n")
                 .add("\t.map(it -> ($T)it)\n", ProcessorProxy.class)
@@ -103,7 +109,7 @@ public class ProxyProcessorChainGenerator {
                 ParameterizedTypeName.get(
                     ClassName.get(Map.class),
                     classOfAny(),
-                    classOfAny()
+                    ClassName.get(ProcessorHandlerDetails.class)
                 ),
                 fieldName
             )

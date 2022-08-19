@@ -15,7 +15,6 @@ repositories {
 dependencies {
     constraints {
         // Define dependency versions as constraints
-//        implementation("org.apache.commons:commons-text:1.9")
         implementation("org.slf4j:slf4j-api:1.7.36")
         implementation("org.slf4j:slf4j-simple:1.7.36")
 
